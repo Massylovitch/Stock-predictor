@@ -29,7 +29,7 @@ def get_baseline_model_error(X_test, y_test):
 def train(X, y):
 
     experiment = Experiment(
-        api_key = os.environ["COMET_API_KEY"],
+        api_key = os.environ["COMET_ML_API_KEY"],
         workspace=os.environ["COMET_ML_WORKSPACE"],
         project_name = "stock-predictor",
     )
