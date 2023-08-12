@@ -3,20 +3,16 @@ from pathlib import Path
 
 import pandas as pd
 import numpy as np
-# import fire
-# import ta
-# from sklearn.base import BaseEstimator, TransformerMixin
-# from sklearn.pipeline import make_pipeline, Pipeline
-# from sklearn.preprocessing import FunctionTransformer
-
+from sklearn.pipeline import make_pipeline, Pipeline
+from sklearn.preprocessing import FunctionTransformer
+import fire
 from src.utils.paths import DATA_DIR
 from src.utils.logger import get_console_logger
 
 logger = get_console_logger()
 
 def build_features(
-    # ts_data: pd.DataFrame,
-    path_to_input: Optional[Path] = DATA_DIR / 'external' /'ohlc_data.parquet',
+     path_to_input: Optional[Path] = DATA_DIR / 'external' /'ohlc_data.parquet',
     input_seq_len: Optional[int] = 24,
     step_size: Optional[int] = 1
 ) -> Tuple[pd.DataFrame, pd.Series]:
@@ -85,3 +81,33 @@ def get_cutoff_indices_features_and_target(
         subseq_last_idx += step_size
 
     return indices
+
+def get_subset_of_features(X: pd.DataFrame) -> pd.DataFrame:
+    return X[['price_1_hour_ago', 'percentage_return_2_hour', 'percentage_return_24_hour']]
+
+def get_price_percentage_return(X: pd.DataFrame, hours: int) -> pd.DataFrame:
+    """Add the price return of the last `hours` to the input DataFrame."""
+    X[f'percentage_return_{hours}_hour'] = \
+        (X['price_1_hour_ago'] - X[f'price_{hours}_hour_ago'])/ X[f'price_{hours}_hour_ago']
+    return X
+
+def get_preprocessing_pipeline():
+    return make_pipeline(
+        # trends
+        FunctionTransformer(get_price_percentage_return, kw_args={'hours': 2}),
+        FunctionTransformer(get_price_percentage_return, kw_args={'hours': 24}),
+
+        # select columns
+        FunctionTransformer(get_subset_of_features)
+    )
+
+
+if __name__ == '__main__':
+    
+    features, target = fire.Fire(build_features)
+    
+    preprocessing_pipeline = get_preprocessing_pipeline()
+
+    preprocessing_pipeline.fit(features)
+    X = preprocessing_pipeline.transform(features)
+    print(X.head())
