@@ -90,3 +90,5 @@ target/
 
 # Deployment
 env_vars.sh
+/models
+.json
