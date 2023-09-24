@@ -1,1 +1,4 @@
-
+pandas
+scikit-learn
+comet-ml
+fire
