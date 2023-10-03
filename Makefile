@@ -1,4 +1,4 @@
-.PHONY: init data baseline train deploy prepare-deployment
+.PHONY: init data baseline train deploy prepare-deployment test-endpoint
 
 DEPLOYMENT_DIR = deployment_dir
 
@@ -25,3 +25,6 @@ prepare-deployment:
 	
 deploy: prepare-deployment
 	cd $(DEPLOYMENT_DIR) && poetry run cerebrium deploy --api-key $(CEREBRIUM_API_KEY) --hardware=CPU eth-predictor
+
+test-endpoint:
+	poetry run python -m src.test_endpoint
