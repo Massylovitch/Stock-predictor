@@ -1,4 +1,4 @@
-.PHONY: init data baseline train deploy prepare-deployment test-endpoint
+.PHONY: init data baseline train deploy prepare-deployment
 
 DEPLOYMENT_DIR = deployment_dir
 
@@ -24,4 +24,4 @@ prepare-deployment:
 	pip install cerebrium --upgrade # otherwise cerebrium deploy might fail
 	
 deploy: prepare-deployment
-	cd $(DEPLOYMENT_DIR) && poetry run cerebrium deploy --api-key $(CEREBRIUM_API_KEY) --hardware GPU eth-predictor
+	cd $(DEPLOYMENT_DIR) && poetry run cerebrium deploy --api-key $(CEREBRIUM_API_KEY) --hardware=CPU eth-predictor
