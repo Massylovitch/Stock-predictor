@@ -7,24 +7,20 @@ init:
 	poetry install
 	
 data:
-	poetry run python src/data.py
+	poetry run python -m src.data.make_data
 
 baseline:
-	poetry run python src/baseline_model.py
+	poetry run python -m src.models.model1.train
 
 train:
-	poetry run python src/train.py
+	poetry run python -m src.models.model2.train 
 
 prepare-deployment:
 	rm -rf $(DEPLOYMENT_DIR) && mkdir $(DEPLOYMENT_DIR)
 	# poetry export -f requirements.txt --output $(DEPLOYMENT_DIR)/requirements.txt --without-hashes
-	cp requirements.txt  $(DEPLOYMENT_DIR)/requirements.txt
+	cp cerebrium.toml  $(DEPLOYMENT_DIR)/cerebrium.toml
 	cp -r src/predict.py $(DEPLOYMENT_DIR)/main.py
 	cp -r src $(DEPLOYMENT_DIR)/src/
-	pip install cerebrium --upgrade # otherwise cerebrium deploy might fail
 	
 deploy: prepare-deployment
-	cd $(DEPLOYMENT_DIR) && poetry run cerebrium deploy --api-key $(CEREBRIUM_API_KEY) --hardware=CPU eth-predictor
-
-test-endpoint:
-	poetry run python -m src.test_endpoint
+	cd $(DEPLOYMENT_DIR) && poetry run cerebrium deploy --disable-syntax-check
