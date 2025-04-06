@@ -93,3 +93,6 @@ env_vars.sh
 /models
 *.json
 deployment_dir/
+*.pkl
+deploy.py
+*.ipynb
